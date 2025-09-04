@@ -10,7 +10,7 @@ import {
 import GradButton from '../shared/GradButton';
 
 export default function SignIn() {
-const { setUser } = useUser();
+    const { setUser } = useUser();
     useEffect(() => {
         setUser(null);
         configureGoogleSignIn();

@@ -5,6 +5,6 @@ import GradButton from '../shared/GradButton';
 
 export default function SignOut() {
   return (
-      <GradButton text="Sign Out" gradientColors={Gradients.signOut} onPress={signOutFromGoogle} />
+    <GradButton text="Sign Out" gradientColors={Gradients.signOut} onPress={signOutFromGoogle} />
   );
 }
