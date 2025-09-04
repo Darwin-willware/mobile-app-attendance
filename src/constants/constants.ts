@@ -7,6 +7,8 @@ export const SSID = 'JioFiber-JeENX_5G';
 export const supabaseUrl='https://ztackpyyiusmsppwjsse.supabase.co';
 export const supabseAnonKey='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp0YWNrcHl5aXVzbXNwcHdqc3NlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ0MDkyMjMsImV4cCI6MjA2OTk4NTIyM30.2QiXy684Y4EsyJfIe8clhRO86_nxVzYuXKGKrXg_qHI';
 
+export const oAuthWebClientId ='996503523872-h89tpt84rgkvob14p2vb03eih3ao228k.apps.googleusercontent.com';
+
 // constants/gradients.ts
  const fallBackButtonGradient: readonly [ColorValue, ColorValue] = ['#4353FD', '#7A5CFA'];
  const MoreButtonGradient: readonly [ColorValue, ColorValue] = ['#00F5FF', '#0088FF'];

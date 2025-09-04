@@ -1,4 +1,4 @@
-import { toast } from '@backpackapp-io/react-native-toast';
+import { useToast } from '@/src/context/ToastContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useFocusEffect } from 'expo-router';
 import React, { useCallback, useState } from 'react';
@@ -21,6 +21,7 @@ const { width } = Dimensions.get('window');
 
 
 const SwipeCard = ({ userId }: { userId: string }) => {
+
   const [status, setStatus] = useState<Status>('idle');
   const [checkInTime, setCheckInTime] = useState<string | null>(null);
   const [checkOutTime, setCheckOutTime] = useState<string | null>(null);
@@ -28,18 +29,18 @@ const SwipeCard = ({ userId }: { userId: string }) => {
   const [Loading, setLoading] = useState<boolean>(false);
   const [onWifi, setOnWifi] = useState<boolean>(false);
   const translateX = useSharedValue(0);
+  const { showToast } = useToast();
+
 
   useFocusEffect(
     useCallback(() => {
       const init = async () => {
-        setLoading(true); // Start loading
-
+        setLoading(true);
         const presence = await validateUserPresence(Lat, Long, SSID);
-        setOnWifi(presence.isInLocation || presence.isOnWiFi);
+        setOnWifi(presence);
         if (!onWifi) {
-          toast.error('Please connect to office Wi-Fi');
+          showToast('Please connect to office Wi-Fi', 'error');
           setLoading(false);
-          return;
         }
         try {
           const todayStatus = await getTodayCheckInStatus(userId);
@@ -52,7 +53,7 @@ const SwipeCard = ({ userId }: { userId: string }) => {
             setCheckInTime(convertUTCToIST(todayStatus.check_in_time));
             setCheckOutTime(convertUTCToIST(todayStatus.check_out_time));
             setTotalHours(todayStatus.total_hours);
-            toast.success(`You have already checked out. Total working hours: ${todayStatus.total_hours}`);
+            showToast(`You have already checked out. Total working hours: ${todayStatus.total_hours}`, 'success');
           } else {
             setStatus('idle');
           }
@@ -60,7 +61,7 @@ const SwipeCard = ({ userId }: { userId: string }) => {
 
         }
 
-        setLoading(false); // End loading
+        setLoading(false);
       };
 
       init();
@@ -70,16 +71,16 @@ const SwipeCard = ({ userId }: { userId: string }) => {
 
   const updateStatus = async (newStatus: Status) => {
     if (!onWifi) {
-      toast.error('Please connect to office Wi-Fi');
+      showToast('Please connect to office Wi-Fi', 'error');
       return;
     }
     if (status === 'checkedin' && newStatus === 'checkedin') {
-      toast.error('You have already checked in for today');
+      showToast('You have already checked in for today', 'error');
       return;
     }
 
     if (status === 'checkedout') {
-      toast.error('You have already checked out for today');
+      showToast('You have already checked out for today', 'error');
       return;
     }
 
@@ -90,34 +91,34 @@ const SwipeCard = ({ userId }: { userId: string }) => {
         const result = await checkIn(userId);
 
         if (!result) {
-          toast.error('No response from server');
+          showToast('No response from server', 'error');
           return;
         }
 
         if ('error' in result) {
-          toast.error(result.error);
+          showToast(result.error, 'error');
         } else {
           setCheckInTime(convertUTCToIST(result.check_in_time));
-          toast.success('Checked In');
+          showToast('Checked In', 'success');
         }
       } else if (newStatus === 'checkedout') {
         const result = await checkOut(userId);
 
         if (!result) {
-          toast.error('No response from server');
+          showToast('No response from server', 'error');
           return;
         }
 
         if ('error' in result) {
-          toast.error(result.error);
+          showToast(result.error, 'error');
         } else {
           setCheckOutTime(convertUTCToIST(result.check_out_time));
           setTotalHours(result.total_hours);
-          toast.success('Checked Out');
+          showToast('Checked Out', 'success');
         }
       }
     } catch (err: any) {
-      toast.error(err.message || 'Something went wrong');
+      showToast(err.message || 'Something went wrong', 'error');
     }
   };
 

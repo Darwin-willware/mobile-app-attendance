@@ -1,6 +1,6 @@
+import { useToast } from '@/src/context/ToastContext';
 import { applyRequest } from '@/src/services/apply-WFH-Leave/apply_leave_wfh';
 import { ApplyResult, BottomModalSheetProps, RequestType } from '@/src/types/models';
-import { toast } from '@backpackapp-io/react-native-toast';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useState } from 'react';
 import {
@@ -20,6 +20,7 @@ export default function BottomModalSheet({ visible, onClose, userId }: BottomMod
   const [isDatePickerVisible, setDatePickerVisible] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [loading, setLoading] = useState(false);
+  const { showToast } = useToast();
 
   const showDatePicker = () => setDatePickerVisible(true);
   const hideDatePicker = () => setDatePickerVisible(false);
@@ -47,13 +48,11 @@ export default function BottomModalSheet({ visible, onClose, userId }: BottomMod
             text: 'Yes',
             onPress: async () => {
               const forcedResult: ApplyResult = await applyRequest(userId, formattedDate, type, true);
-              
-              // Type guard check
+
               if ('success' in forcedResult) {
-                toast[forcedResult.success ? 'success' : 'error'](
-                  forcedResult.success 
-                    ? 'Applied successfully'
-                    : forcedResult.message
+                showToast(
+                  forcedResult.success ? 'Applied successfully' : forcedResult.message,
+                  forcedResult.success ? 'success' : 'error'
                 );
                 if (forcedResult.success) onClose();
               }
@@ -62,12 +61,10 @@ export default function BottomModalSheet({ visible, onClose, userId }: BottomMod
         ]
       );
     } else {
-      // Type guard check for non-conflict results
       if ('success' in result) {
-        toast[result.success ? 'success' : 'error'](
-          result.success 
-            ? 'Applied successfully'
-            : result.message
+        showToast(
+          result.success ? 'Applied successfully' : result.message,
+          result.success ? 'success' : 'error'
         );
         if (result.success) onClose();
       }

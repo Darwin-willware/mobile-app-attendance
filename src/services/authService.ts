@@ -1,7 +1,8 @@
 // src/services/authService.ts
-import { toast } from '@backpackapp-io/react-native-toast';
 import { GoogleSignin, isErrorWithCode, isSuccessResponse, statusCodes } from '@react-native-google-signin/google-signin';
 import { router } from 'expo-router';
+import { oAuthWebClientId } from '../constants/constants';
+import { showGlobalToast } from '../context/ToastContext';
 import supabase from '../lib/supabase';
 import { GoogleUser } from '../types/models';
 
@@ -18,7 +19,7 @@ const waitForSupabaseSession = async (retries = 5, delay = 500): Promise<any> =>
 
 export const configureGoogleSignIn = () => {
     GoogleSignin.configure({
-        webClientId: '996503523872-h89tpt84rgkvob14p2vb03eih3ao228k.apps.googleusercontent.com',
+        webClientId: oAuthWebClientId,
         scopes: ['https://www.googleapis.com/auth/drive.readonly'],
     });
 };
@@ -32,7 +33,7 @@ export const signInWithGoogle = async (): Promise<GoogleUser | null> => {
             const { user, idToken } = response.data;
 
             if (!idToken) {
-                toast.error('Missing ID token');
+                showGlobalToast('Missing ID token','error');
                 return null;
             }
 
@@ -42,13 +43,13 @@ export const signInWithGoogle = async (): Promise<GoogleUser | null> => {
             });
 
             if (error) {
-                toast.error(`Supabase sign-in failed: ${error.message}`);
+                showGlobalToast(`Supabase sign-in failed: ${error.message}`,'error');
                 return null;
             }
 
             const supabaseUser = await waitForSupabaseSession();
             if (!supabaseUser) {
-                toast.error('Supabase session not established');
+                showGlobalToast('Supabase session not established','error');
                 return null;
             }
 
@@ -60,26 +61,26 @@ export const signInWithGoogle = async (): Promise<GoogleUser | null> => {
             };
 
             cachedUser = userInfo;
-            toast.success('Successfully Signed In');
+            showGlobalToast('Successfully Signed In','success');
             return userInfo;
         }
 
-        toast.error('Google Sign-In failed');
+        showGlobalToast('Google Sign-In failed','error');
         return null;
     } catch (error: any) {
         if (isErrorWithCode(error)) {
             switch (error.code) {
                 case statusCodes.IN_PROGRESS:
-                    toast.error('Sign-in in progress');
+                    showGlobalToast('Sign-in in progress','error');
                     break;
                 case statusCodes.PLAY_SERVICES_NOT_AVAILABLE:
-                    toast.error('Google Play Services not available');
+                    showGlobalToast('Google Play Services not available','error');
                     break;
                 default:
-                    toast.error(`Sign-in error: ${error.message}`);
+                    showGlobalToast(`Sign-in error: ${error.message}`,'error');
             }
         } else {
-            toast.error(`Unknown error: ${JSON.stringify(error)}`);
+            showGlobalToast(`Unknown error: ${JSON.stringify(error)}`,'error');
         }
         return null;
     }
@@ -91,9 +92,9 @@ export const signOutFromGoogle = async () => {
         await GoogleSignin.signOut();
         router.replace('/');
         cachedUser = null;
-        toast.success('Successfully Logged Out');
+        showGlobalToast('Successfully Logged Out','success');
     } catch (error) {
-        toast.error(`Logout failed: ${JSON.stringify(error)}`);
+        showGlobalToast(`Logout failed: ${JSON.stringify(error)}`,'success');
     }
 };
 
@@ -124,7 +125,6 @@ export const getCurrentGoogleUser = async (): Promise<GoogleUser | null> => {
 export const getCurrentSupabaseUser = async () => {
     const { data: { user }, error } = await supabase.auth.getUser();
     if (error || !user) return null;
-
     return user;
 };
 

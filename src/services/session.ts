@@ -1,6 +1,5 @@
-import { toast } from '@backpackapp-io/react-native-toast';
+import { showGlobalToast } from '../context/ToastContext';
 import supabase from '../lib/supabase';
-
 export const getCurrentSessionUser = async () => {
 
     const {
@@ -9,7 +8,7 @@ export const getCurrentSessionUser = async () => {
     } = await supabase.auth.getUser();
     console.log("Userdetails", user);
     if (error || !user) {
-        toast.error('User not logged in');
+        showGlobalToast('User not logged in','error');
         return null;
     }
     return user;
@@ -24,7 +23,7 @@ export const ensureUserExists = async (userId: string, email: string, name?: str
         .single();
 
     if (error && error.code !== 'PGRST116') {
-        toast.error('Error checking user');
+        showGlobalToast('Error checking user','error');
         return null;
     }
 
@@ -42,7 +41,7 @@ export const ensureUserExists = async (userId: string, email: string, name?: str
             .single();
 
         if (insertError) {
-            toast.error('Error creating user');
+            showGlobalToast('Error creating user','error');
             return null;
         }
 
