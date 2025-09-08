@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { SafeAreaView, StyleSheet } from 'react-native';
+import { Dimensions, SafeAreaView, ScrollView, StyleSheet, View } from 'react-native';
 import BottomBar from '../components/main/BottomBar';
 import LeaveTable from '../components/main/LeaveTable';
 import StatusSection from '../components/main/StatusSection';
@@ -9,18 +9,18 @@ import { CyberGradient } from '../components/shared/CyberGradient';
 import { useToast } from '../context/ToastContext';
 import { useUser } from '../context/userContext';
 import { ensureUserExists, getCurrentSessionUser } from '../services/session';
+import { getUserDetails } from '../services/users';
+import { GetUserDetailsParams } from '../types/models';
+
+const screenHeight = Dimensions.get('window').height;
 
 export default function MainScreen() {
   const [userId, setUserId] = useState<string | null>(null);
-  const [userName, setUserName] = useState<string>('User');
+  const [userDetails, setUserDetails] = useState<any>('User');
   const { setUser } = useUser();
   const { showToast } = useToast();
 
-
-
   useEffect(() => {
-
-
     const init = async () => {
       const sessionUser = await getCurrentSessionUser();
       if (!sessionUser) return;
@@ -37,24 +37,31 @@ export default function MainScreen() {
       const userRecord = await ensureUserExists(id, email, name, photo);
       if (userRecord) {
         setUserId(userRecord.user_id);
-        setUserName(userRecord.name || 'User');
+        fetchUserDetails({userId:userRecord.user_id});
       }
     };
 
     init();
   }, []);
 
-
+const fetchUserDetails = async(userId:GetUserDetailsParams) =>{
+  const res = await getUserDetails(userId);
+setUserDetails(res);
+}
 
   if (!userId) return null;
 
   return (
     <CyberGradient>
       <SafeAreaView style={styles.container}>
-        <TopCard userName={userName} />
-        <LeaveTable availableLeaves={15} leavesTaken={12} />
+        <View style={{ height: '70%' }}>
+          <TopCard userName={userDetails?.name} />
+          <ScrollView contentContainerStyle={styles.scrollContent}>
+            <LeaveTable availableLeaves={userDetails?.leaves_available} leavesTaken={userDetails?.leaves_taken} />
+            <StatusSection userId={userId} />
+          </ScrollView>
+        </View>
         <SwipeCard userId={userId} />
-        <StatusSection userId={userId} />
       </SafeAreaView>
       <BottomBar />
     </CyberGradient>
@@ -66,8 +73,11 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'stretch',
-    width:'100%',
+    width: '100%',
     paddingHorizontal: 20,
-    paddingBottom:60
+    paddingBottom: 60
+  },
+  scrollContent: {
+    paddingBottom: 10,
   }
 });

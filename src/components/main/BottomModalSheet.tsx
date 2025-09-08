@@ -1,3 +1,4 @@
+import { useStatusRefresh } from '@/src/context/StatusRefreshContext';
 import { useToast } from '@/src/context/ToastContext';
 import { applyRequest } from '@/src/services/apply-WFH-Leave/apply_leave_wfh';
 import { ApplyResult, BottomModalSheetProps, RequestType } from '@/src/types/models';
@@ -21,6 +22,7 @@ export default function BottomModalSheet({ visible, onClose, userId }: BottomMod
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [loading, setLoading] = useState(false);
   const { showToast } = useToast();
+  const { triggerRefresh } = useStatusRefresh();
 
   const showDatePicker = () => setDatePickerVisible(true);
   const hideDatePicker = () => setDatePickerVisible(false);
@@ -63,6 +65,7 @@ export default function BottomModalSheet({ visible, onClose, userId }: BottomMod
                   forcedResult.success ? 'Applied successfully' : forcedResult.message,
                   forcedResult.success ? 'success' : 'error'
                 );
+                triggerRefresh();
                 if (forcedResult.success) onClose();
               }
             },
@@ -75,6 +78,7 @@ export default function BottomModalSheet({ visible, onClose, userId }: BottomMod
           result.success ? 'Applied successfully' : result.message,
           result.success ? 'success' : 'error'
         );
+        triggerRefresh();
         if (result.success) onClose();
       }
     }

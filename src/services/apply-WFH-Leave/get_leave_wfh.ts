@@ -10,7 +10,7 @@ export const fetchAppliedEntries = async (userId: string,fetchType:FetchType = '
     .eq('user_id', userId)
     .gte('date', today); 
   if (error) {
-    console.error('Error fetching WFH entries:', error);
+    console.log('Error fetching WFH entries:', error);
     return [];
   }
 

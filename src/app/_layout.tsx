@@ -3,8 +3,7 @@ import { useEffect, useState } from 'react';
 import { StyleSheet } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { ToastProvider } from '../context/ToastContext';
-import { UserProvider } from '../context/userContext';
+import { AppProvider } from '../context/AppProvider';
 import supabase from '../lib/supabase';
 
 export default function RootLayout() {
@@ -58,18 +57,16 @@ export default function RootLayout() {
   if (!isAuthChecked) return null;
 
   return (
-    <ToastProvider>
-      <UserProvider>
-        <SafeAreaProvider>
-          <GestureHandlerRootView style={styles.root}>
-            <Stack screenOptions={{ headerShown: false }}>
-              <Stack.Screen name="index" />
-              <Stack.Screen name="main" />
-            </Stack>
-          </GestureHandlerRootView>
-        </SafeAreaProvider>
-      </UserProvider>
-    </ToastProvider>
+    <AppProvider>
+      <SafeAreaProvider>
+        <GestureHandlerRootView style={styles.root}>
+          <Stack screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="index" />
+            <Stack.Screen name="main" />
+          </Stack>
+        </GestureHandlerRootView>
+      </SafeAreaProvider>
+    </AppProvider>
   );
 }
 

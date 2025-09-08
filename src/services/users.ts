@@ -7,7 +7,6 @@ export const getUserDetails = async ({ email, userId }: GetUserDetailsParams) =>
   const { data, error } = email
     ? await query.eq('email', email).single()
     : await query.eq('user_id', userId).single();
-
   if (error) throw error;
   return data;
 };
@@ -23,7 +22,7 @@ export const getTodayCheckInStatus = async (userId: string) => {
     .single();
 
   if (error) {
-    console.error("Error fetching today's check-in:", error);
+    console.log("Error fetching today's check-in:", error);
     return null;
   }
 

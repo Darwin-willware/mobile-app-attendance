@@ -44,7 +44,9 @@ const SwipeCard = ({ userId }: { userId: string }) => {
         }
         try {
           const todayStatus = await getTodayCheckInStatus(userId);
-
+          if (todayStatus?.can_check_in_without_wifi) {
+            setOnWifi(true);
+          }
           if (todayStatus?.check_in_time && !todayStatus?.check_out_time) {
             setStatus('checkedin');
             setCheckInTime(convertUTCToIST(todayStatus.check_in_time));

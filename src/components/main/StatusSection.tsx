@@ -1,13 +1,14 @@
 import { Gradients } from '@/src/constants/constants';
+import { useStatusRefresh } from '@/src/context/StatusRefreshContext';
 import { fetchAppliedEntries } from '@/src/services/apply-WFH-Leave/get_leave_wfh';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
 const StatusSection = ({ userId }: { userId: string }) => {
   const [appliedLeaves, setAppliedLeaves] = useState<any[]>([]);
   const [appliedWFH, setAppliedWFH] = useState<any[]>([]);
-
+ const {refreshKey} = useStatusRefresh();
   useEffect(() => {
     const fetchData = async () => {
       const leaves = await fetchAppliedEntries(userId, 'applied_leaves');
@@ -19,7 +20,7 @@ const StatusSection = ({ userId }: { userId: string }) => {
     if (userId) {
       fetchData();
     }
-  }, [userId]);
+  }, [userId,refreshKey]);
 
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
@@ -42,10 +43,10 @@ const StatusSection = ({ userId }: { userId: string }) => {
 
   return (
     <LinearGradient colors={Gradients.defaultCard} style={styles.gradient}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+      
         <Text style={[styles.title, { color: '#00F5FF' }]}>Applied Leaves</Text>
         {appliedLeaves.length === 0 ? (
-          <Text style={styles.empty}>No upcoming leaves</Text>
+          <Text style={styles.empty}>No Leaves Applied</Text>
         ) : (
           appliedLeaves.map((leave, index) => (
             <View key={index} style={styles.row}>
@@ -57,7 +58,7 @@ const StatusSection = ({ userId }: { userId: string }) => {
 
         <Text style={[styles.title, { color: '#FFB347' }]}>Applied WFH</Text>
         {appliedWFH.length === 0 ? (
-          <Text style={styles.empty}>No upcoming WFH entries</Text>
+          <Text style={styles.empty}>No WFH Applied</Text>
         ) : (
           appliedWFH.map((wfh, index) => (
             <View key={index} style={styles.row}>
@@ -66,7 +67,6 @@ const StatusSection = ({ userId }: { userId: string }) => {
             </View>
           ))
         )}
-      </ScrollView>
     </LinearGradient>
   );
 };
@@ -77,10 +77,6 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     padding: 15,
     width: '100%',
-    maxHeight: 250,
-  },
-  scrollContent: {
-    paddingBottom: 10,
   },
   title: {
     fontWeight: 'bold',
@@ -92,6 +88,7 @@ const styles = StyleSheet.create({
     gap: 10,
     marginBottom: 10,
     alignItems: 'center',
+    justifyContent:'space-between'
   },
   chip: {
     paddingHorizontal: 10,
