@@ -11,7 +11,7 @@ import Animated, {
   useSharedValue,
   withSpring,
 } from 'react-native-reanimated';
-import { Gradients, Lat, Long, SSID } from '../../constants/constants';
+import { Gradients, HOME_SSID, Lat, Long } from '../../constants/constants';
 import { checkIn, checkOut, convertUTCToIST, getTodayCheckInStatus } from '../../services/users';
 import { validateUserPresence } from '../../services/wifi/checkIn-validator';
 import { Status } from '../../types/models';
@@ -36,7 +36,7 @@ const SwipeCard = ({ userId }: { userId: string }) => {
     useCallback(() => {
       const init = async () => {
         setLoading(true);
-        const presence = await validateUserPresence(Lat, Long, SSID);
+        const presence = await validateUserPresence(Lat, Long, HOME_SSID);
         setOnWifi(presence);
         if (!onWifi) {
           showToast('Please connect to office Wi-Fi', 'error');
@@ -70,6 +70,11 @@ const SwipeCard = ({ userId }: { userId: string }) => {
 
 
   const updateStatus = async (newStatus: Status) => {
+    const day = new Date().getDay();
+    if (day === 0 || day === 6) {
+      showToast('You cannot CheckIn or CheckOut on weekends.', 'error');
+      return;
+    }
     if (!onWifi) {
       showToast('Please connect to office Wi-Fi', 'error');
       return;

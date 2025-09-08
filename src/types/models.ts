@@ -37,3 +37,5 @@ export type ApplyResult =
   | { success: true } 
   | { success: false; message: string } 
   | { conflict: RequestType };
+
+export type FetchType = 'applied_leaves' | 'applied_wfh';

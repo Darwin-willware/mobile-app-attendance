@@ -59,3 +59,6 @@ https://docs.expo.dev/build/setup/
 java -jar bundletool.jar build-apks --bundle=filename.aab --output=newfilename.apks --mode=universal
 
 java -jar bundletool-all-1.18.1.jar build-apks --bundle=attendance.aab --output=output.apks --mode=universal
+
+after changing eas.json
+eas build -p android --profile apk

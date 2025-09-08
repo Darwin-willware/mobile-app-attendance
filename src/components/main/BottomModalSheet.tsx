@@ -26,9 +26,18 @@ export default function BottomModalSheet({ visible, onClose, userId }: BottomMod
   const hideDatePicker = () => setDatePickerVisible(false);
 
   const handleConfirm = (date: Date) => {
+    const day = date.getDay();
+
+    if (day === 0 || day === 6) {
+      showToast('You cannot apply for Leave or WFH on weekends.', 'error');
+      hideDatePicker();
+      return;
+    }
+
     setSelectedDate(date);
     hideDatePicker();
   };
+
 
   const formattedDate = selectedDate?.toISOString().split('T')[0];
 
