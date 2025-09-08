@@ -1,4 +1,6 @@
+import { Gradients } from '@/src/constants/constants';
 import { fetchAppliedEntries } from '@/src/services/apply-WFH-Leave/get_leave_wfh';
+import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
@@ -19,50 +21,92 @@ const StatusSection = ({ userId }: { userId: string }) => {
     }
   }, [userId]);
 
-  return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.title}>Applied Leaves</Text>
-      {appliedLeaves.length === 0 ? (
-        <Text>No upcoming leaves</Text>
-      ) : (
-        appliedLeaves.map((leave, index) => (
-          <View key={index} style={styles.item}>
-            <Text>{leave.date}</Text>
-            <Text>Status: {leave.status}</Text>
-          </View>
-        ))
-      )}
+  const getStatusColor = (status: string) => {
+    switch (status.toLowerCase()) {
+      case 'approved':
+        return '#4CAF50'; 
+      case 'requested':
+        return '#2196F3'; 
+      case 'rejected':
+        return '#F44336'; 
+      default:
+        return '#999';
+    }
+  };
 
-      <Text style={styles.title}>Applied WFH</Text>
-      {appliedWFH.length === 0 ? (
-        <Text>No upcoming WFH entries</Text>
-      ) : (
-        appliedWFH.map((wfh, index) => (
-          <View key={index} style={styles.item}>
-            <Text>{wfh.date}</Text>
-            <Text>Status: {wfh.status}</Text>
-          </View>
-        ))
-      )}
-    </ScrollView>
+  const renderChip = (label: string, backgroundColor: string) => (
+    <View style={[styles.chip, { backgroundColor }]}>
+      <Text style={styles.chipText}>{label}</Text>
+    </View>
+  );
+
+  return (
+    <LinearGradient colors={Gradients.defaultCard} style={styles.gradient}>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <Text style={[styles.title, { color: '#00F5FF' }]}>Applied Leaves</Text>
+        {appliedLeaves.length === 0 ? (
+          <Text style={styles.empty}>No upcoming leaves</Text>
+        ) : (
+          appliedLeaves.map((leave, index) => (
+            <View key={index} style={styles.row}>
+              {renderChip(leave.date, '#ffffff30')}
+              {renderChip(leave.status, getStatusColor(leave.status))}
+            </View>
+          ))
+        )}
+
+        <Text style={[styles.title, { color: '#FFB347' }]}>Applied WFH</Text>
+        {appliedWFH.length === 0 ? (
+          <Text style={styles.empty}>No upcoming WFH entries</Text>
+        ) : (
+          appliedWFH.map((wfh, index) => (
+            <View key={index} style={styles.row}>
+              {renderChip(wfh.date, '#ffffff30')}
+              {renderChip(wfh.status, getStatusColor(wfh.status))}
+            </View>
+          ))
+        )}
+      </ScrollView>
+    </LinearGradient>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    maxHeight: 200,
+  gradient: {
+    borderRadius: 12,
     marginVertical: 10,
-    padding: 10,
-    backgroundColor: '#f9f9f9',
-    borderRadius: 8,
+    padding: 15,
     width: '100%',
+    maxHeight: 250,
+  },
+  scrollContent: {
+    paddingBottom: 10,
   },
   title: {
     fontWeight: 'bold',
-    marginTop: 10,
+    fontSize: 16,
+    marginBottom: 8,
   },
-  item: {
-    marginVertical: 5,
+  row: {
+    flexDirection: 'row',
+    gap: 10,
+    marginBottom: 10,
+    alignItems: 'center',
+  },
+  chip: {
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 20,
+  },
+  chipText: {
+    color: '#fff',
+    fontSize: 13,
+    fontWeight: '500',
+  },
+  empty: {
+    color: '#ccc',
+    fontStyle: 'italic',
+    marginBottom: 10,
   },
 });
 

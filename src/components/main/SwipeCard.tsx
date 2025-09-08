@@ -11,7 +11,7 @@ import Animated, {
   useSharedValue,
   withSpring,
 } from 'react-native-reanimated';
-import { Gradients, HOME_SSID, Lat, Long } from '../../constants/constants';
+import { Gradients, Lat, Long, SSID } from '../../constants/constants';
 import { checkIn, checkOut, convertUTCToIST, getTodayCheckInStatus } from '../../services/users';
 import { validateUserPresence } from '../../services/wifi/checkIn-validator';
 import { Status } from '../../types/models';
@@ -36,8 +36,8 @@ const SwipeCard = ({ userId }: { userId: string }) => {
     useCallback(() => {
       const init = async () => {
         setLoading(true);
-        const presence = await validateUserPresence(Lat, Long, HOME_SSID);
-        setOnWifi(presence);
+        const presence = await validateUserPresence(Lat, Long, SSID);
+        setOnWifi(presence.isOnWiFi);
         if (!onWifi) {
           showToast('Please connect to office Wi-Fi', 'error');
           setLoading(false);
@@ -76,6 +76,7 @@ const SwipeCard = ({ userId }: { userId: string }) => {
       return;
     }
     if (!onWifi) {
+      console.log(onWifi);
       showToast('Please connect to office Wi-Fi', 'error');
       return;
     }
@@ -177,7 +178,7 @@ const SwipeCard = ({ userId }: { userId: string }) => {
         <PanGestureHandler onGestureEvent={gestureHandler}>
           <Animated.View style={[styles.card, animatedStyle]}>
             <LinearGradient colors={getGradientColors()} style={styles.gradient}>
-              <Text style={styles.text}>{getCardText()}</Text>
+              <Text style={styles.text}>{getCardText()}{onWifi}</Text>
             </LinearGradient>
           </Animated.View>
         </PanGestureHandler>
